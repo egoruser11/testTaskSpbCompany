@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+    nginx:
+        image: nginx:latest
+        volumes:
+            - ./:/var/www/
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        ports:
+            - "8872:80"
+        depends_on:
+            -   app
+        container_name: spb_nginx
+
+    app:
+        build:
+            context: ../testTaskSpb
+            dockerfile: ./docker/app/Dockerfile
+        volumes:
+            - ./:/var/www/
+        depends_on:
+            - db
+        container_name: spb_app
+    db:
+        image: mysql:8.0
+        restart: always
+        volumes:
+            -   ./tmp/db:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: effectiveMob
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - 8111:3306
+        command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+        container_name: spb_db
+
+
